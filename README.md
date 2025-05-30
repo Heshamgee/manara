@@ -1,3 +1,7 @@
+![image](https://github.com/user-attachments/assets/c7b1226f-e9c8-4560-87b6-23bf33e9c2a9)
+
+
+
 **AWS EC2-based Web Application Architecture (High Availability & Scalability)**
 
 **Project Overview:**
