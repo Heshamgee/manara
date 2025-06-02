@@ -2,79 +2,86 @@
 
 
 
-**AWS EC2-based Web Application Architecture (High Availability & Scalability)**
+AWS cloud-based architecture designed for a scalable, serverless web application
 
 **Project Overview:**
-Deploy a simple web application on AWS using EC2 instances. Ensure high availability and scalability using Elastic Load Balancing (ALB) and Auto Scaling Groups (ASG). Follow best practices for compute scalability, security, and cost optimization.
+This document describes the components and data flow of an AWS Cloud-based architecture for a scalable, serverless web application with integrated storage, search, cost tracking, and container-based discovery services.
+
+
+### Web UI Component
+
+1. **Amazon CloudFront**: Delivers the frontend content to users globally with low latency.
+2. **Amazon S3 (WebUIBucket)**: Hosts the static frontend assets (HTML, CSS, JS).
+3. **AWS WAF**: Protects the application by filtering and monitoring HTTP requests.
+4. **AWS AppSync**: Provides GraphQL API for interaction between frontend and backend services.
+5. **Amazon Cognito**: Manages user authentication and access control.
+6. **AWS Lambda (Settings function)**: Handles frontend settings logic.
 
 ---
 
-**Architecture Components:**
+### Storage Management Component
 
-1. **EC2 (Elastic Compute Cloud)**
+7. **AWS Amplify**: Provides integration and management for the frontend and hosting workflow.
 
-   * Launch and run virtual servers to host the web application.
-   * Placed within Auto Scaling Groups for scalability.
-
-2. **Application Load Balancer (ALB)**
-
-   * Distributes incoming traffic across EC2 instances.
-   * Improves availability and fault tolerance.
-
-3. **Auto Scaling Group (ASG)**
-
-   * Automatically adds/removes EC2 instances based on traffic/load.
-   * Maintains a minimum and maximum number of instances.
-
-4. **Amazon RDS (Optional)**
-
-   * Managed relational database (MySQL/PostgreSQL).
-   * Multi-AZ deployment for high availability.
-
-5. **IAM (Identity and Access Management)**
-
-   * Role-based access control for EC2, RDS, and other AWS resources.
-   * Secure access policies for AWS services.
-
-6. **Amazon CloudWatch**
-
-   * Monitor logs, metrics, and alarms.
-   * Integrates with Auto Scaling policies.
-
-7. **Amazon SNS (Simple Notification Service)**
-
-   * Sends alerts and notifications based on CloudWatch alarms.
+   * Connected to **Amazon S3 (AmplifyStorageBucket)** for storage needs.
 
 ---
 
-**Learning Outcomes:**
+### Data Component (Private Subnet)
 
-* Understanding of secure and scalable deployment using EC2.
-* Implementing ALB for load distribution.
-* Using ASG for automatic instance scaling.
-* Integrating CloudWatch and SNS for proactive monitoring and alerts.
-* Applying IAM best practices for access control.
-* Optionally deploying a resilient backend using RDS Multi-AZ.
+8. **AWS Lambda (Gremlin Resolver)**: Queries data from Amazon Neptune using the Gremlin query language.
 
----
+   * **Amazon Neptune**: Graph database service.
+9. **AWS Lambda (Search Resolver)**: Queries data from OpenSearch.
 
-**Architecture Diagram:**
-(See generated AWS architecture diagram image showing EC2, ALB, ASG, IAM, CloudWatch, SNS, and RDS interactions.)
+   * **Amazon OpenSearch Service**: Provides full-text search and analytics capabilities.
 
 ---
 
-**Deployment Best Practices:**
+### Cost Component
 
-* Use launch templates for ASG.
-* Set health checks on ALB and ASG.
-* Distribute EC2 instances across multiple AZs.
-* Regularly review IAM policies.
-* Enable enhanced monitoring on EC2 and RDS.
+10. **AWS Lambda (Cost function)**: Executes logic to retrieve and process cost data.
+11. **Amazon Athena**: Queries CUR (Cost and Usage Reports) stored in S3.
+12. **AWS CUR (Cost & Usage Report)**: Delivered to an **S3 Bucket (CURBucket)**.
+13. **Amazon S3 (AthenaResultsBucket)**: Stores results of Athena queries.
 
 ---
 
-**Security Notes:**
+### Image Deployment Component
 
-* Use Security Groups and NACLs for network-level control.
-* Apply IAM roles to EC2 instead of embedding credentials.
-* Enable encryption for data at rest and in transit (RDS and ALB).
+14. **Amazon S3 (DiscoveryBucket)**: Stores source artifacts or Dockerfile for image creation.
+15. **AWS CodeBuild**: Builds container images using the source artifacts.
+
+* Pushes the image to **Amazon Elastic Container Registry (ECR)**.
+
+---
+
+### Discovery Component
+
+16. **Amazon ECS (Elastic Container Service)**: Runs containers managed by AWS Fargate.
+17. **AWS Fargate**: Serverless compute engine that runs containerized workloads.
+
+---
+
+### Integration and Management
+
+18. **AWS SDK**: Enables programmatic interaction with AWS services from within the application.
+19. **AWS Config**: Tracks and audits AWS resource configurations.
+
+---
+
+### Summary
+
+This architecture leverages multiple AWS services to provide a scalable, secure, and highly available web application. Key features include:
+
+* CDN delivery with CloudFront
+* GraphQL API with AppSync
+* Secure authentication with Cognito
+* Serverless computing with Lambda and Fargate
+* Data storage, search, and analytics with S3, Neptune, OpenSearch, and Athena
+* Continuous cost tracking using CUR and Athena
+* Containerized deployment pipeline with CodeBuild, ECR, and ECS
+
+---
+
+
